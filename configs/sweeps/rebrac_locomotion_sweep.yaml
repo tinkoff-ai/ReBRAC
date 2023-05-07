@@ -1,0 +1,48 @@
+project: ReBRAC
+program: src/algorithms/rebrac.py
+method: grid
+parameters:
+  config_path:
+    values: [
+      "configs/rebrac/halfcheetah/halfcheetah_medium.yaml",
+      "configs/rebrac/halfcheetah/halfcheetah_medium_expert.yaml",
+      "configs/rebrac/halfcheetah/halfcheetah_medium_replay.yaml",
+
+      "configs/rebrac/halfcheetah/halfcheetah_random.yaml",
+      "configs/rebrac/halfcheetah/halfcheetah_expert.yaml",
+      "configs/rebrac/halfcheetah/halfcheetah_full_replay.yaml",
+
+      "configs/rebrac/walker2d/walker2d_medium.yaml",
+      "configs/rebrac/walker2d/walker2d_medium_expert.yaml",
+      "configs/rebrac/walker2d/walker2d_medium_replay.yaml",
+
+      "configs/rebrac/walker2d/walker2d_random.yaml",
+      "configs/rebrac/walker2d/walker2d_expert.yaml",
+      "configs/rebrac/walker2d/walker2d_full_replay.yaml",
+
+      "configs/rebrac/hopper/hopper_medium.yaml",
+      "configs/rebrac/hopper/hopper_medium_expert.yaml",
+      "configs/rebrac/hopper/hopper_medium_replay.yaml",
+
+      "configs/rebrac/hopper/hopper_random.yaml",
+      "configs/rebrac/hopper/hopper_expert.yaml",
+      "configs/rebrac/hopper/hopper_full_replay.yaml",
+    ]
+  train_seed:
+     values: [0, 1, 2, 3]
+  gamma:
+    values: [0.99]
+  actor_bc_coef:
+    values: [0.001, 0.01, 0.05, 0.1]
+  critic_bc_coef:
+     values: [0, 0.001, 0.01, 0.1, 0.5]
+  critic_ln:
+     value: true
+  batch_size:
+    value: 1024
+  actor_learning_rate:
+    value: 0.001
+  critic_learning_rate:
+    value: 0.001
+  num_epochs:
+    value: 1000

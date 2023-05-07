@@ -1,0 +1,32 @@
+project: ReBRAC
+program: src/algorithms/rebrac.py
+method: grid
+parameters:
+  config_path:
+    values: [
+     "configs/rebrac/antmaze/antmaze_umaze_diverse.yaml",
+     "configs/rebrac/antmaze/antmaze_medium_diverse.yaml",
+     "configs/rebrac/antmaze/antmaze_large_diverse.yaml",
+
+     "configs/rebrac/antmaze/antmaze_umaze.yaml",
+     "configs/rebrac/antmaze/antmaze_medium_play.yaml",
+     "configs/rebrac/antmaze/antmaze_large_play.yaml",
+    ]
+  train_seed:
+     values: [0, 1, 2, 3]
+  gamma:
+    values: [0.999]
+  actor_bc_coef:
+     values: [0.0005, 0.001, 0.002, 0.003]
+  critic_bc_coef:
+     values: [0, 0.0005, 0.001, 0.002]
+  critic_ln:
+     value: true
+  batch_size:
+    value: 256
+  actor_learning_rate:
+     value: 0.0003
+  critic_learning_rate:
+    value: 0.00005
+  num_epochs:
+    value: 1000

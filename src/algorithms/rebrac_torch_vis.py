@@ -431,10 +431,6 @@ class ReBRAC:  # noqa
 
 @pyrallis.wrap()
 def train(config: TrainConfig):
-    with open(os.path.join("./", "config.yaml"), "w") as f:
-        pyrallis.dump(config, f)
-    return
-
     env = make(config.task_name, 3, 2, config.eval_seed)
 
     data_specs = (env.observation_spec(),

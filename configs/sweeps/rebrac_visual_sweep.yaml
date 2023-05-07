@@ -1,0 +1,39 @@
+project: ReBRAC
+program: src/algorithms/rebrac_torch_vis.py
+method: grid
+parameters:
+  config_path:
+    values: [
+    "configs/rebrac-vis/walker_walk/expert.yaml",
+    "configs/rebrac-vis/walker_walk/medium_expert.yaml",
+    "configs/rebrac-vis/walker_walk/medium.yaml",
+    "configs/rebrac-vis/walker_walk/medium_replay.yaml",
+    "configs/rebrac-vis/walker_walk/random.yaml",
+
+    "configs/rebrac-vis/cheetah_run/expert.yaml",
+    "configs/rebrac-vis/cheetah_run/medium_expert.yaml",
+    "configs/rebrac-vis/cheetah_run/medium.yaml",
+    "configs/rebrac-vis/cheetah_run/medium_replay.yaml",
+    "configs/rebrac-vis/cheetah_run/random.yaml",
+
+    "configs/rebrac-vis/humanoid_walk/expert.yaml",
+    "configs/rebrac-vis/humanoid_walk/medium_expert.yaml",
+    "configs/rebrac-vis/humanoid_walk/medium.yaml",
+    "configs/rebrac-vis/humanoid_walk/medium_replay.yaml",
+    "configs/rebrac-vis/humanoid_walk/random.yaml",
+
+    ]
+  seed:
+     values: [0, 1]
+  actor_bc_coef:
+    values: [0.03, 0.1, 0.3, 1.0]
+  critic_bc_coef:
+     values: [0, 0.001, 0.005, 0.01, 0.1]
+  critic_ln:
+     value: true
+  batch_size:
+    value: 256
+  actor_learning_rate:
+    value: 0.0003
+  critic_learning_rate:
+    value: 0.0003

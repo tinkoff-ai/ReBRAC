@@ -216,9 +216,6 @@ def main(config: Config):
     dict_config = asdict(config)
     dict_config["mlc_job_name"] = os.environ.get("PLATFORM_JOB_NAME")
 
-    with open(os.path.join("./", "config.yaml"), "w") as f:
-        pyrallis.dump(config, f)
-    return
     wandb.init(
         config=dict_config,
         project=config.project,
