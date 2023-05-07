@@ -25,6 +25,7 @@ parameters:
     ]
   seed:
      values: [0, 1]
+     # values: [10, 11, 12, 13, 14, 15]  # Evaluation seeds
   actor_bc_coef:
     values: [0.03, 0.1, 0.3, 1.0]
   critic_bc_coef:
