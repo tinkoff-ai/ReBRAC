@@ -1,5 +1,7 @@
 # Revisiting the Minimalist Approach to Offline Reinforcement Learning
 
+<img src="figures/showcase.png" alt="Method and Results Summary" title="Method and Results Summary">
+
 This repository contains an official implementation of
 [LINK TO ARXIV]().
 
