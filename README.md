@@ -1,9 +1,8 @@
 # Revisiting the Minimalist Approach to Offline Reinforcement Learning
 
-<img src="figures/showcase.png" alt="Method and Results Summary" title="Method and Results Summary">
+[![arXiv](https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg)](https://arxiv.org/abs/1234.56789)
 
-This repository contains an official implementation of
-[LINK TO ARXIV]().
+<img src="figures/showcase.png" alt="Method and Results Summary" title="Method and Results Summary">
 
 ## Dependencies & Docker setup
 To set up python environment (with dev-tools of your taste, in our workflow we use conda and python 3.8), 
