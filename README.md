@@ -1,4 +1,4 @@
-# Revisited Behavior Regularized Actor-Critic
+# Revisiting the Minimalist Approach to Offline Reinforcement Learning
 
 This repository contains an official implementation of
 [LINK TO ARXIV]().
@@ -39,6 +39,8 @@ docker run -it \
     sac_rnd bash
 ```
 ## How to reproduce experiments
+
+*Here should be instructions on how to reprlicate each table and figure*
 
 Configs for the main experiments are stored in the `configs/rebrac/<task_type>`. All available hyperparameters are listed in the  `rebrac/algorithms/rebrac.py`.
 
