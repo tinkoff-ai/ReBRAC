@@ -60,10 +60,14 @@ By default data is expected to be stored in the directory from which training sc
 Configs for the main experiments are stored in the `configs/rebrac/<task_type>` and `configs/rebrac-vis/<task_type>`. 
 All available hyperparameters are listed in the `rebrac/algorithms/rebrac.py` for D4RL and `rebrac/algorithms/rebrac_torch_vis.py` for V-D4RL.
 
-For example, to start ReBRAC training process with `halfcheetah-medium-v2` dataset, run the following:
+For example, to start ReBRAC training process with D4RL `halfcheetah-medium-v2` dataset, run the following:
 ```commandline
-python offline_sac/algorithms/rebrac.py \
-    --config_path="configs/rebrac/halfcheetah/halfcheetah_medium.yaml"
+PYTHONPATH=. python3 src/algorithms/rebrac.py --config_path="configs/rebrac/halfcheetah/halfcheetah_medium.yaml"
+```
+
+For V-D4RL `walker_walk-expert-v2` dataset, run the following:
+```commandline
+PYTHONPATH=. python3 src/algorithms/rebrac_torch_vis.py --config_path="configs/rebrac-vis/walker_walk/expert.yaml"
 ```
 
 To reproduce results from our work you can use Wandb sweeps provided in the `configs/sweeps`.  Note, we do not provide codebase for IQL and SAC-RND.

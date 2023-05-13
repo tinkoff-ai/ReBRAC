@@ -44,6 +44,7 @@ class TrainConfig:
     max_timesteps: int = int(1e5)  # Max time steps to run environment
     checkpoints_path: Optional[str] = None  # Save path
     load_model: str = ""  # Model load file name, "" doesn't load
+    vd4rl_path: str = "./vd4rl"
     # TD3
     buffer_size: int = 1_000_000  # Replay buffer size
     actor_learning_rate: float = 3e-4
@@ -444,7 +445,7 @@ def train(config: TrainConfig):
     )
 
     load_offline_dataset_into_buffer(
-        Path(f"./vd4rl/main/{config.task_name}/{config.dataset_name}/84px"),
+        Path(f"{config.vd4rl_path}/main/{config.task_name}/{config.dataset_name}/84px"),
         replay_buffer,
         3,
         buffer_size,
