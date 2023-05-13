@@ -37,13 +37,28 @@ docker run -it \
     --rm \
     --volume "<PATH_TO_THE_REPO>:/workspace/" \
     --name rebrac \
-    sac_rnd bash
+    rebrac bash
 ```
+
+### V-D4RL
+In order to reproduce V-D4RL it is needed to be downloaded. Probably, the easiest way is to download it with the links below and unpack the archives.
+
+* [walker_walk](https://drive.google.com/file/d/1F4LIH_khOFw1asVvXo82OMa2tZ0Ax5Op/view?usp=sharing)
+* [cheetah_run](https://drive.google.com/file/d/1WR2LfK0y94C_1r2e1ps1dg6zSMHlVY_e/view?usp=sharing)
+* [humanoid_walk](https://drive.google.com/file/d/1zTBL8KWR3o07BQ62jJR7CeatN7vb-vjd/view?usp=sharing)
+
+Note, that provided  links contain only datasets reported in the paper without distraction and multitasking.
+
+By default data is expected to be stored in the directory from which training script is called.
+
 ## How to reproduce experiments
+
+### Training
 
 *Here should be instructions on how to reprlicate each table and figure*
 
-Configs for the main experiments are stored in the `configs/rebrac/<task_type>`. All available hyperparameters are listed in the  `rebrac/algorithms/rebrac.py`.
+Configs for the main experiments are stored in the `configs/rebrac/<task_type>` and `configs/rebrac-vis/<task_type>`. 
+All available hyperparameters are listed in the `rebrac/algorithms/rebrac.py` for D4RL and `rebrac/algorithms/rebrac_torch_vis.py` for V-D4RL.
 
 For example, to start ReBRAC training process with `halfcheetah-medium-v2` dataset, run the following:
 ```commandline
@@ -51,7 +66,19 @@ python offline_sac/algorithms/rebrac.py \
     --config_path="configs/rebrac/halfcheetah/halfcheetah_medium.yaml"
 ```
 
-To reproduce our sweeps, create wandb sweep from configs in `configs/sweeps`. After that, start wandb agent with created sweep ID. That's all! Have fun!
+To reproduce results from our work you can use Wandb sweeps provided in the `configs/sweeps`.  Note, we do not provide codebase for IQL and SAC-RND.
+
+| Paper element          | Sweeps to run from `configs/sweeps/`                         |
+|------------------------|--------------------------------------------------------------|
+| Tables 2, 3, 4         | `eval/rebrac_d4rl_sweep.yaml`, `eval/td3_bc_d4rl_sweep.yaml` |
+| Table 5                | `eval/rebrac_visual_sweep.yaml`                              |
+| Table 6                | All sweeps from `ablations`                                  |
+| Figure 2               | All sweeps from `network_sizes`                              |
+| Hyperparameters tuning | All sweeps from `tuning`                                     |
+
+
+### EOP and Performance Profiles
+To reproduce EOP and Performance Profiles see `eop/ReBRAC_ploting.ipynb`. 
 
 # Citing
 If you use this code for your research, please consider the following bibtex:
