@@ -4,6 +4,30 @@ method: grid
 parameters:
   config_path:
     values: [
+      "configs/rebrac/door/door_cloned.yaml",
+      "configs/rebrac/door/door_human.yaml",
+      "configs/rebrac/door/door_expert.yaml",
+
+      "configs/rebrac/hammer/hammer_cloned.yaml",
+      "configs/rebrac/hammer/hammer_human.yaml",
+      "configs/rebrac/hammer/hammer_expert.yaml",
+
+      "configs/rebrac/pen/pen_cloned.yaml",
+      "configs/rebrac/pen/pen_human.yaml",
+      "configs/rebrac/pen/pen_expert.yaml",
+
+      "configs/rebrac/relocate/relocate_cloned.yaml",
+      "configs/rebrac/relocate/relocate_human.yaml",
+      "configs/rebrac/relocate/relocate_expert.yaml",
+
+      "configs/rebrac/antmaze/antmaze_umaze_diverse.yaml",
+      "configs/rebrac/antmaze/antmaze_medium_diverse.yaml",
+      "configs/rebrac/antmaze/antmaze_large_diverse.yaml",
+
+      "configs/rebrac/antmaze/antmaze_umaze.yaml",
+      "configs/rebrac/antmaze/antmaze_medium_play.yaml",
+      "configs/rebrac/antmaze/antmaze_large_play.yaml",
+
       "configs/rebrac/halfcheetah/halfcheetah_medium.yaml",
       "configs/rebrac/halfcheetah/halfcheetah_medium_expert.yaml",
       "configs/rebrac/halfcheetah/halfcheetah_medium_replay.yaml",
@@ -29,10 +53,8 @@ parameters:
       "configs/rebrac/hopper/hopper_full_replay.yaml",
     ]
   train_seed:
-     values: [0, 1, 2, 3]
-  gamma:
-    values: [0.99]
-  actor_bc_coef:
-    values: [0.001, 0.01, 0.05, 0.1]
-  critic_bc_coef:
-     values: [0, 0.001, 0.01, 0.1, 0.5]
+     values: [10, 11, 12, 13]
+  actor_n_hiddens:
+    value: 5
+  critic_n_hiddens:
+    value: 5

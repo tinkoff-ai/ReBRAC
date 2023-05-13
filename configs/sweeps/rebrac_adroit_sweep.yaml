@@ -22,20 +22,7 @@ parameters:
     ]
   train_seed:
      values: [0, 1, 2, 3]
-     # values: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]  # Evaluation seeds
-  gamma:
-    values: [0.99]
   actor_bc_coef:
     values: [0.001, 0.01, 0.05, 0.1]
   critic_bc_coef:
      values: [0, 0.001, 0.01, 0.1, 0.5]
-  critic_ln:
-     value: true
-  batch_size:
-    value: 256
-  actor_learning_rate:
-    value: 0.0003
-  critic_learning_rate:
-    value: 0.0003
-  num_epochs:
-    value: 1000

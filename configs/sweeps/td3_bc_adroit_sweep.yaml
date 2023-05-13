@@ -1,0 +1,28 @@
+project: ReBRAC
+program: src/algorithms/rebrac.py
+method: grid
+parameters:
+  config_path:
+    values: [
+    "configs/td3_bc/door/door_cloned.yaml",
+    "configs/td3_bc/door/door_human.yaml",
+    "configs/td3_bc/door/door_expert.yaml",
+
+    "configs/td3_bc/hammer/hammer_cloned.yaml",
+    "configs/td3_bc/hammer/hammer_human.yaml",
+    "configs/td3_bc/hammer/hammer_expert.yaml",
+
+    "configs/td3_bc/pen/pen_cloned.yaml",
+    "configs/td3_bc/pen/pen_human.yaml",
+    "configs/td3_bc/pen/pen_expert.yaml",
+
+    "configs/td3_bc/relocate/relocate_cloned.yaml",
+    "configs/td3_bc/relocate/relocate_human.yaml",
+    "configs/td3_bc/relocate/relocate_expert.yaml",
+    ]
+  train_seed:
+     values: [0, 1, 2, 3]
+  gamma:
+    values: [0.99]
+  actor_bc_coef:
+    values: [0.001, 0.01, 0.05, 0.1, 0.4]

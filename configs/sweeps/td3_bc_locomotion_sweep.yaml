@@ -1,0 +1,34 @@
+project: ReBRAC
+program: src/algorithms/rebrac.py
+method: grid
+parameters:
+  config_path:
+    values: [
+      "configs/td3_bc/halfcheetah/halfcheetah_medium.yaml",
+      "configs/td3_bc/halfcheetah/halfcheetah_medium_expert.yaml",
+      "configs/td3_bc/halfcheetah/halfcheetah_medium_replay.yaml",
+
+      "configs/td3_bc/halfcheetah/halfcheetah_random.yaml",
+      "configs/td3_bc/halfcheetah/halfcheetah_expert.yaml",
+      "configs/td3_bc/halfcheetah/halfcheetah_full_replay.yaml",
+
+      "configs/td3_bc/walker2d/walker2d_medium.yaml",
+      "configs/td3_bc/walker2d/walker2d_medium_expert.yaml",
+      "configs/td3_bc/walker2d/walker2d_medium_replay.yaml",
+
+      "configs/td3_bc/walker2d/walker2d_random.yaml",
+      "configs/td3_bc/walker2d/walker2d_expert.yaml",
+      "configs/td3_bc/walker2d/walker2d_full_replay.yaml",
+
+      "configs/td3_bc/hopper/hopper_medium.yaml",
+      "configs/td3_bc/hopper/hopper_medium_expert.yaml",
+      "configs/td3_bc/hopper/hopper_medium_replay.yaml",
+
+      "configs/td3_bc/hopper/hopper_random.yaml",
+      "configs/td3_bc/hopper/hopper_expert.yaml",
+      "configs/td3_bc/hopper/hopper_full_replay.yaml",
+    ]
+  train_seed:
+     values: [0, 1, 2, 3]
+  actor_bc_coef:
+    values: [0.001, 0.01, 0.05, 0.1, 0.4]

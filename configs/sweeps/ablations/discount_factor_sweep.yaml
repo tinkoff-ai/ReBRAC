@@ -13,8 +13,6 @@ parameters:
      "configs/rebrac/antmaze/antmaze_large_play.yaml",
     ]
   train_seed:
-     values: [0, 1, 2, 3]
-  actor_bc_coef:
-     values: [0.0005, 0.001, 0.002, 0.003]
-  critic_bc_coef:
-     values: [0, 0.0005, 0.001, 0.002]
+     values: [10, 11, 12, 13]
+  gamma:
+    value: 0.99

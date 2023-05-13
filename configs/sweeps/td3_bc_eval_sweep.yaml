@@ -1,0 +1,56 @@
+project: ReBRAC
+program: src/algorithms/rebrac.py
+method: grid
+parameters:
+  config_path:
+    values: [
+    "configs/td3_bc/door/door_cloned.yaml",
+    "configs/td3_bc/door/door_human.yaml",
+    "configs/td3_bc/door/door_expert.yaml",
+
+    "configs/td3_bc/hammer/hammer_cloned.yaml",
+    "configs/td3_bc/hammer/hammer_human.yaml",
+    "configs/td3_bc/hammer/hammer_expert.yaml",
+
+    "configs/td3_bc/pen/pen_cloned.yaml",
+    "configs/td3_bc/pen/pen_human.yaml",
+    "configs/td3_bc/pen/pen_expert.yaml",
+
+    "configs/td3_bc/relocate/relocate_cloned.yaml",
+    "configs/td3_bc/relocate/relocate_human.yaml",
+    "configs/td3_bc/relocate/relocate_expert.yaml",
+
+    "configs/td3_bc/antmaze/antmaze_umaze_diverse.yaml",
+    "configs/td3_bc/antmaze/antmaze_medium_diverse.yaml",
+    "configs/td3_bc/antmaze/antmaze_large_diverse.yaml",
+
+    "configs/td3_bc/antmaze/antmaze_umaze.yaml",
+    "configs/td3_bc/antmaze/antmaze_medium_play.yaml",
+    "configs/td3_bc/antmaze/antmaze_large_play.yaml",
+
+    "configs/td3_bc/halfcheetah/halfcheetah_medium.yaml",
+    "configs/td3_bc/halfcheetah/halfcheetah_medium_expert.yaml",
+    "configs/td3_bc/halfcheetah/halfcheetah_medium_replay.yaml",
+
+    "configs/td3_bc/halfcheetah/halfcheetah_random.yaml",
+    "configs/td3_bc/halfcheetah/halfcheetah_expert.yaml",
+    "configs/td3_bc/halfcheetah/halfcheetah_full_replay.yaml",
+
+    "configs/td3_bc/walker2d/walker2d_medium.yaml",
+    "configs/td3_bc/walker2d/walker2d_medium_expert.yaml",
+    "configs/td3_bc/walker2d/walker2d_medium_replay.yaml",
+
+    "configs/td3_bc/walker2d/walker2d_random.yaml",
+    "configs/td3_bc/walker2d/walker2d_expert.yaml",
+    "configs/td3_bc/walker2d/walker2d_full_replay.yaml",
+
+    "configs/td3_bc/hopper/hopper_medium.yaml",
+    "configs/td3_bc/hopper/hopper_medium_expert.yaml",
+    "configs/td3_bc/hopper/hopper_medium_replay.yaml",
+
+    "configs/td3_bc/hopper/hopper_random.yaml",
+    "configs/td3_bc/hopper/hopper_expert.yaml",
+    "configs/td3_bc/hopper/hopper_full_replay.yaml",
+    ]
+  train_seed:
+    values: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]  # Evaluation seeds

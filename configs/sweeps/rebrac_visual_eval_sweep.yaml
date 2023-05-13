@@ -21,10 +21,7 @@ parameters:
     "configs/rebrac-vis/humanoid_walk/medium.yaml",
     "configs/rebrac-vis/humanoid_walk/medium_replay.yaml",
     "configs/rebrac-vis/humanoid_walk/random.yaml",
+
     ]
   seed:
-     values: [0, 1]
-  actor_bc_coef:
-    values: [0.03, 0.1, 0.3, 1.0]
-  critic_bc_coef:
-     values: [0, 0.001, 0.005, 0.01, 0.1]
+     values: [10, 11, 12, 13, 14]
