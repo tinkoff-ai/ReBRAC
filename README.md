@@ -55,8 +55,6 @@ By default data is expected to be stored in the directory from which training sc
 
 ### Training
 
-*Here should be instructions on how to reprlicate each table and figure*
-
 Configs for the main experiments are stored in the `configs/rebrac/<task_type>` and `configs/rebrac-vis/<task_type>`. 
 All available hyperparameters are listed in the `rebrac/algorithms/rebrac.py` for D4RL and `rebrac/algorithms/rebrac_torch_vis.py` for V-D4RL.
 
