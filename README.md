@@ -68,7 +68,8 @@ For V-D4RL `walker_walk-expert-v2` dataset, run the following:
 PYTHONPATH=. python3 src/algorithms/rebrac_torch_vis.py --config_path="configs/rebrac-vis/walker_walk/expert.yaml"
 ```
 
-To reproduce results from our work you can use Wandb sweeps provided in the `configs/sweeps`.  Note, we do not provide codebase for IQL and SAC-RND.
+### Targeted Reproduction
+To reproduce results from our work you can use Wandb sweeps provided in the `configs/sweeps`.  Note, we do not provide a codebase for both IQL and SAC-RND, however, in our work, we used these implementations: [IQL (CORL)](https://github.com/tinkoff-ai/CORL), [SAC-RND (original implementation)](https://github.com/tinkoff-ai/sac-rnd).
 
 | Paper element          | Sweeps to run from `configs/sweeps/`                         |
 |------------------------|--------------------------------------------------------------|
