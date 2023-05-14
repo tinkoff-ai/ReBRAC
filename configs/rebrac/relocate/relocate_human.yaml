@@ -7,12 +7,12 @@ critic_bc_coef: 0.01
 critic_learning_rate: 0.0003
 critic_ln: true
 critic_n_hiddens: 3
-dataset_name: relocate-expert-v1
+dataset_name: relocate-human-v1
 eval_episodes: 10
 eval_every: 5
 eval_seed: 42
 gamma: 0.99
-group: rebrac-relocate-expert-v1
+group: rebrac-relocate-human-v1
 hidden_dim: 256
 name: rebrac
 noise_clip: 0.5

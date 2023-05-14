@@ -313,7 +313,7 @@ def main(config: Config):
     def actor_action_fn(params, obs):
         return actor.apply_fn(params, obs)
 
-    for epoch in trange(config.num_epochs, desc="TD3 + BC Epochs"):
+    for epoch in trange(config.num_epochs, desc="ReBRAC Epochs"):
         # for epoch in range(config.num_epochs):
         # metrics for accumulation during epoch and logging to wandb, we need to reset them every epoch
         update_carry["metrics"] = Metrics.create(bc_metrics_to_log)
@@ -326,7 +326,7 @@ def main(config: Config):
         )
         # log mean over epoch for each metric
         mean_metrics = update_carry["metrics"].compute()
-        wandb.log({"epoch": epoch, **{f"TD3/{k}": v for k, v in mean_metrics.items()}})
+        wandb.log({"epoch": epoch, **{f"ReBRAC/{k}": v for k, v in mean_metrics.items()}})
 
         if epoch % config.eval_every == 0 or epoch == config.num_epochs - 1:
             eval_returns = evaluate(eval_env, update_carry["actor"].params, actor_action_fn, config.eval_episodes,

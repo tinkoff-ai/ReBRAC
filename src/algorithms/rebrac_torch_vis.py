@@ -502,7 +502,7 @@ def train(config: TrainConfig):
     }
 
     print("---------------------------------------")
-    print(f"Training TD3 + BC, Env: {config.task_name}, {config.dataset_name} Seed: {seed}")
+    print(f"Training ReBRAC, Env: {config.task_name}, {config.dataset_name} Seed: {seed}")
     print("---------------------------------------")
 
     # Initialize actor
@@ -521,7 +521,6 @@ def train(config: TrainConfig):
     evaluations = []
     for t in trange(config.max_timesteps, desc="ReBRAC steps"):
         batch = list(to_torch(next(replay_buffer), config.device))
-        # batch = [b.to(config.device) for b in batch]
         log_dict = trainer.train(batch)
         wandb.log(log_dict, step=trainer.total_it)
         # Evaluate episode
