@@ -15,7 +15,6 @@ import random
 import uuid
 import warnings
 
-import d4rl
 from dm_env import specs
 import gym
 import numpy as np
@@ -41,7 +40,7 @@ class TrainConfig:
     eval_seed: int = 0  # Sets Gym, PyTorch and Numpy seeds
     eval_freq: int = int(1e3)  # How often (time steps) we evaluate
     n_episodes: int = 10  # How many episodes run during evaluation
-    max_timesteps: int = int(1e5)  # Max time steps to run environment
+    max_timesteps: int = int(3e5)  # Max time steps to run environment
     checkpoints_path: Optional[str] = None  # Save path
     load_model: str = ""  # Model load file name, "" doesn't load
     vd4rl_path: str = "./vd4rl"
@@ -233,17 +232,6 @@ class Actor(nn.Module):
 
         self.apply(weight_init)
 
-        # self.net = nn.Sequential(
-        #     nn.Linear(state_dim, hidden_dim),
-        #     nn.ReLU(),
-        #     nn.Linear(hidden_dim, hidden_dim),
-        #     nn.ReLU(),
-        #     nn.Linear(hidden_dim, hidden_dim),
-        #     nn.ReLU(),
-        #     nn.Linear(hidden_dim, action_dim),
-        #     nn.Tanh(),
-        # )
-        # self.apply(weight_init)
         self.max_action = max_action
 
     def forward(self, state: torch.Tensor) -> torch.Tensor:
@@ -252,7 +240,6 @@ class Actor(nn.Module):
         mu = self.policy(h)
         mu = torch.tanh(mu)
         return self.max_action * mu
-        # return self.max_action * self.net(state)
 
     @torch.no_grad()
     def act(self, state: np.ndarray, device: str = "cpu") -> np.ndarray:
@@ -444,8 +431,10 @@ def train(config: TrainConfig):
         data_specs=data_specs, sarsa=True
     )
 
+    data_path = f"{config.vd4rl_path}/main/{config.task_name}/{config.dataset_name}/84px"
+    print("Trying to load data from:", data_path)
     load_offline_dataset_into_buffer(
-        Path(f"{config.vd4rl_path}/main/{config.task_name}/{config.dataset_name}/84px"),
+        Path(data_path),
         replay_buffer,
         3,
         buffer_size,

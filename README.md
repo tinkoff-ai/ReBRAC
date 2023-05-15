@@ -9,7 +9,7 @@ To set up python environment (with dev-tools of your taste, in our workflow we u
 just install all the requirements:
 
 ```commandline
-python install -r requirements.txt
+python3 install -r requirements.txt
 ```
 
 However, in this setup, you would also need to install mujoco210 binaries by hand. Sometimes this is not super straightforward,
