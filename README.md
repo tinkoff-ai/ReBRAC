@@ -41,7 +41,8 @@ docker run -it \
 ```
 
 ### V-D4RL
-In order to reproduce V-D4RL it is needed to be downloaded. Probably, the easiest way is to download it with the links below and unpack the archives.
+In order to reproduce V-D4RL it is needed to be downloaded. Probably, the easiest way is to run the `download_vd4rl.sh` script which we provide. 
+Links to the datasets archives: 
 
 * [walker_walk](https://drive.google.com/file/d/1F4LIH_khOFw1asVvXo82OMa2tZ0Ax5Op/view?usp=sharing)
 * [cheetah_run](https://drive.google.com/file/d/1WR2LfK0y94C_1r2e1ps1dg6zSMHlVY_e/view?usp=sharing)
