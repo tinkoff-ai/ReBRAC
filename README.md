@@ -5,15 +5,13 @@
 <img src="figures/showcase.png" alt="Method and Results Summary" title="Method and Results Summary">
 
 ## Dependencies & Docker setup
-To set up python environment (with dev-tools of your taste, in our workflow we use conda and python 3.8), 
-just install all the requirements:
+To set up a python environment (with dev-tools of your taste, in our workflow, we use conda and python 3.8), just install all the requirements:
 
 ```commandline
 python3 install -r requirements.txt
 ```
 
-However, in this setup, you would also need to install mujoco210 binaries by hand. Sometimes this is not super straightforward,
-but we used this recipe:
+However, in this setup, you must install mujoco210 binaries by hand. Sometimes this is not super straightforward, but this recipe can help:
 ```commandline
 mkdir -p /root/.mujoco \
     && wget https://mujoco.org/download/mujoco210-linux-x86_64.tar.gz -O mujoco.tar.gz \
@@ -26,7 +24,7 @@ We recommend following the official guide from [mujoco_py](https://github.com/op
 
 ### Docker
 
-We also provide a simpler way, with a dockerfile that is already set up to work, all you have to do is build and run it :)
+We also provide a more straightforward way with a dockerfile that is already set up to work. All you have to do is build and run it :)
 ```commandline
 docker build -t rebrac .
 ```
@@ -41,16 +39,17 @@ docker run -it \
 ```
 
 ### V-D4RL
-In order to reproduce V-D4RL it is needed to be downloaded. Probably, the easiest way is to run the `download_vd4rl.sh` script which we provide. 
-Links to the datasets archives: 
+To reproduce V-D4RL, you need to download the corresponding datasets. The easiest way is probably to run the `download_vd4rl.sh` script we provide. 
+
+You can also do it manually with the following links to the datasets archives: 
 
 * [walker_walk](https://drive.google.com/file/d/1F4LIH_khOFw1asVvXo82OMa2tZ0Ax5Op/view?usp=sharing)
 * [cheetah_run](https://drive.google.com/file/d/1WR2LfK0y94C_1r2e1ps1dg6zSMHlVY_e/view?usp=sharing)
 * [humanoid_walk](https://drive.google.com/file/d/1zTBL8KWR3o07BQ62jJR7CeatN7vb-vjd/view?usp=sharing)
 
-Note, that provided  links contain only datasets reported in the paper without distraction and multitasking.
+Note that provided links contain only datasets reported in the paper without distraction and multitasking.
 
-By default, data is expected to be stored inside `vd4rl` directory in the directory from which training script is called.
+After downloading the datasets, you must put the data into the `vd4rl` directory.
 
 ## How to reproduce experiments
 
