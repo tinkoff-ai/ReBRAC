@@ -1,6 +1,6 @@
 # Revisiting the Minimalist Approach to Offline Reinforcement Learning
 
-[![arXiv](https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg)](https://arxiv.org/abs/1234.56789)
+<!-- [![arXiv](https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg)](https://arxiv.org/abs/1234.56789) -->
 
 <img src="figures/showcase.png" alt="Method and Results Summary" title="Method and Results Summary">
 
@@ -69,9 +69,9 @@ PYTHONPATH=. python3 src/algorithms/rebrac_torch_vis.py --config_path="configs/r
 ```
 
 ### Targeted Reproduction
-We provide all the key runs logs in the form of [Weights & Biases reports](https://wandb.ai/tlab/ReBRAC/reportlist).
+For better transparency and replication, we release all the experiments (5k+) in the form of [Weights & Biases reports](https://wandb.ai/tlab/ReBRAC/reportlist).
 
-To reproduce results from our work, you can use the configs for [Weights & Biases Sweeps](https://docs.wandb.ai/guides/sweeps/quickstart) provided in the `configs/sweeps`.  Note, we do not supply a codebase for both IQL and SAC-RND. However, in our work, we relied upon these implementations: [IQL (CORL)](https://github.com/tinkoff-ai/CORL), [SAC-RND (original implementation)](https://github.com/tinkoff-ai/sac-rnd).
+If you want to replicate results from our work, you can use the configs for [Weights & Biases Sweeps](https://docs.wandb.ai/guides/sweeps/quickstart) provided in the `configs/sweeps`. Note, we do not supply a codebase for both IQL and SAC-RND. However, in our work, we relied upon these implementations: [IQL (CORL)](https://github.com/tinkoff-ai/CORL), [SAC-RND (original implementation)](https://github.com/tinkoff-ai/sac-rnd).
 
 | Paper element          | Sweeps to run from `configs/sweeps/`                         |
 |------------------------|--------------------------------------------------------------|
@@ -82,12 +82,12 @@ To reproduce results from our work, you can use the configs for [Weights & Biase
 | Hyperparameters tuning | All sweeps from `tuning`                                     |
 
 
-### EOP and Performance Profiles
-To reproduce EOP and Performance Profiles see `eop/ReBRAC_ploting.ipynb`. 
+### Reliable Reports
 
-We provide data required for the plotting in `eop/bin` as pickled Python dicts so it can be easily reused in your work. 
-# Citing
+We also provide scripts for reconstructing the graphs in our paper: `eop/ReBRAC_ploting.ipynb`, including performance profiles, probability of improvement, and expected online performance. For your convenience, we repacked the results into .pickle files, so you can re-use them for further research and head-to-head comparisons. 
+
+<!-- # Citing
 If you use this code for your research, please consider the following bibtex:
 ```
 
-```
+``` -->
