@@ -1,6 +1,6 @@
 # Revisiting the Minimalist Approach to Offline Reinforcement Learning
 
-<!-- [![arXiv](https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg)](https://arxiv.org/abs/1234.56789) -->
+[![arXiv](https://img.shields.io/badge/arXiv-2305.09836-b31b1b.svg)](https://arxiv.org/abs/2305.09836)
 
 <img src="figures/showcase.png" alt="Method and Results Summary" title="Method and Results Summary">
 
@@ -86,8 +86,13 @@ If you want to replicate results from our work, you can use the configs for [Wei
 
 We also provide scripts for reconstructing the graphs in our paper: `eop/ReBRAC_ploting.ipynb`, including performance profiles, probability of improvement, and expected online performance. For your convenience, we repacked the results into .pickle files, so you can re-use them for further research and head-to-head comparisons. 
 
-<!-- # Citing
+# Citing
 If you use this code for your research, please consider the following bibtex:
 ```
-
-``` -->
+@article{tarasov2023revisiting,
+  title={Revisiting the Minimalist Approach to Offline Reinforcement Learning},
+  author={Denis Tarasov and Vladislav Kurenkov and Alexander Nikulin and Sergey Kolesnikov},
+  journal={arXiv preprint arXiv:2305.09836},
+  year={2023}
+}
+```
