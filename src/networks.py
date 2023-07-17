@@ -36,6 +36,7 @@ class DetActor(nn.Module):
             nn.relu,
             nn.LayerNorm() if self.layernorm else identity,
             nn.GroupNorm() if self.groupnorm else identity,
+            nn.LayerNorm(use_bias=False, use_scale=False) if self.featurenorm else identity,
         ]
         for _ in range(self.n_hiddens - 1):
             layers += [
@@ -43,6 +44,7 @@ class DetActor(nn.Module):
                 nn.relu,
                 nn.LayerNorm() if self.layernorm else identity,
                 nn.GroupNorm() if self.groupnorm else identity,
+                nn.LayerNorm(use_bias=False, use_scale=False) if self.featurenorm else identity,
             ]
         layers += [
             nn.Dense(self.action_dim, kernel_init=uniform_init(1e-3), bias_init=uniform_init(1e-3)),
@@ -57,6 +59,7 @@ class Critic(nn.Module):
     hidden_dim: int = 256
     layernorm: bool = True
     groupnorm: bool = False
+    featurenorm: bool = False
     n_hiddens: int = 3
 
     @nn.compact
@@ -68,6 +71,7 @@ class Critic(nn.Module):
             nn.relu,
             nn.LayerNorm() if self.layernorm else identity,
             nn.GroupNorm() if self.groupnorm else identity,
+            nn.LayerNorm(use_bias=False, use_scale=False) if self.featurenorm else identity,
         ]
         for _ in range(self.n_hiddens - 1):
             layers += [
@@ -75,6 +79,7 @@ class Critic(nn.Module):
                 nn.relu,
                 nn.LayerNorm() if self.layernorm else identity,
                 nn.GroupNorm() if self.groupnorm else identity,
+                nn.LayerNorm(use_bias=False, use_scale=False) if self.featurenorm else identity,
             ]
         layers += [
             nn.Dense(1, kernel_init=uniform_init(3e-3), bias_init=uniform_init(3e-3))
@@ -90,6 +95,7 @@ class EnsembleCritic(nn.Module):
     num_critics: int = 10
     layernorm: bool = True
     groupnorm: bool = False
+    featurenorm: bool = False
     n_hiddens: int = 3
 
     @nn.compact

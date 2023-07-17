@@ -1,0 +1,62 @@
+project: ReBRAC
+program: src/algorithms/rebrac.py
+method: grid
+parameters:
+  config_path:
+    values: [
+      "configs/rebrac/door/door_cloned.yaml",
+      "configs/rebrac/door/door_human.yaml",
+      "configs/rebrac/door/door_expert.yaml",
+
+      "configs/rebrac/hammer/hammer_cloned.yaml",
+      "configs/rebrac/hammer/hammer_human.yaml",
+      "configs/rebrac/hammer/hammer_expert.yaml",
+
+      "configs/rebrac/pen/pen_cloned.yaml",
+      "configs/rebrac/pen/pen_human.yaml",
+      "configs/rebrac/pen/pen_expert.yaml",
+
+      "configs/rebrac/relocate/relocate_cloned.yaml",
+      "configs/rebrac/relocate/relocate_human.yaml",
+      "configs/rebrac/relocate/relocate_expert.yaml",
+
+      "configs/rebrac/antmaze/antmaze_umaze_diverse.yaml",
+      "configs/rebrac/antmaze/antmaze_medium_diverse.yaml",
+      "configs/rebrac/antmaze/antmaze_large_diverse.yaml",
+
+      "configs/rebrac/antmaze/antmaze_umaze.yaml",
+      "configs/rebrac/antmaze/antmaze_medium_play.yaml",
+      "configs/rebrac/antmaze/antmaze_large_play.yaml",
+
+      "configs/rebrac/halfcheetah/halfcheetah_medium.yaml",
+      "configs/rebrac/halfcheetah/halfcheetah_medium_expert.yaml",
+      "configs/rebrac/halfcheetah/halfcheetah_medium_replay.yaml",
+
+      "configs/rebrac/halfcheetah/halfcheetah_random.yaml",
+      "configs/rebrac/halfcheetah/halfcheetah_expert.yaml",
+      "configs/rebrac/halfcheetah/halfcheetah_full_replay.yaml",
+
+      "configs/rebrac/walker2d/walker2d_medium.yaml",
+      "configs/rebrac/walker2d/walker2d_medium_expert.yaml",
+      "configs/rebrac/walker2d/walker2d_medium_replay.yaml",
+
+      "configs/rebrac/walker2d/walker2d_random.yaml",
+      "configs/rebrac/walker2d/walker2d_expert.yaml",
+      "configs/rebrac/walker2d/walker2d_full_replay.yaml",
+
+      "configs/rebrac/hopper/hopper_medium.yaml",
+      "configs/rebrac/hopper/hopper_medium_expert.yaml",
+      "configs/rebrac/hopper/hopper_medium_replay.yaml",
+
+      "configs/rebrac/hopper/hopper_random.yaml",
+      "configs/rebrac/hopper/hopper_expert.yaml",
+      "configs/rebrac/hopper/hopper_full_replay.yaml",
+    ]
+  train_seed:
+     values: [10, 11, 12, 13]
+  critic_ln:
+    value: false
+  critic_gn:
+    value: false
+  critic_fn:
+    value: true
