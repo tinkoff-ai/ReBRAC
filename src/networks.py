@@ -25,6 +25,7 @@ class DetActor(nn.Module):
     hidden_dim: int = 256
     layernorm: bool = True
     groupnorm: bool = False
+    featurenorm: bool = False
     n_hiddens: int = 3
 
     @nn.compact
