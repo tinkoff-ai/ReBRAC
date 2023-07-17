@@ -24,6 +24,7 @@ class DetActor(nn.Module):
     action_dim: int
     hidden_dim: int = 256
     layernorm: bool = True
+    groupnorm: bool = False
     n_hiddens: int = 3
 
     @nn.compact
@@ -34,12 +35,14 @@ class DetActor(nn.Module):
             nn.Dense(self.hidden_dim, kernel_init=pytorch_init(s_d), bias_init=nn.initializers.constant(0.1)),
             nn.relu,
             nn.LayerNorm() if self.layernorm else identity,
+            nn.GroupNorm() if self.groupnorm else identity,
         ]
         for _ in range(self.n_hiddens - 1):
             layers += [
                 nn.Dense(self.hidden_dim, kernel_init=pytorch_init(h_d), bias_init=nn.initializers.constant(0.1)),
                 nn.relu,
                 nn.LayerNorm() if self.layernorm else identity,
+                nn.GroupNorm() if self.groupnorm else identity,
             ]
         layers += [
             nn.Dense(self.action_dim, kernel_init=uniform_init(1e-3), bias_init=uniform_init(1e-3)),
@@ -53,6 +56,7 @@ class DetActor(nn.Module):
 class Critic(nn.Module):
     hidden_dim: int = 256
     layernorm: bool = True
+    groupnorm: bool = False
     n_hiddens: int = 3
 
     @nn.compact
@@ -63,12 +67,14 @@ class Critic(nn.Module):
             nn.Dense(self.hidden_dim, kernel_init=pytorch_init(s_d + a_d), bias_init=nn.initializers.constant(0.1)),
             nn.relu,
             nn.LayerNorm() if self.layernorm else identity,
+            nn.GroupNorm() if self.groupnorm else identity,
         ]
         for _ in range(self.n_hiddens - 1):
             layers += [
                 nn.Dense(self.hidden_dim, kernel_init=pytorch_init(h_d), bias_init=nn.initializers.constant(0.1)),
                 nn.relu,
                 nn.LayerNorm() if self.layernorm else identity,
+                nn.GroupNorm() if self.groupnorm else identity,
             ]
         layers += [
             nn.Dense(1, kernel_init=uniform_init(3e-3), bias_init=uniform_init(3e-3))
@@ -83,6 +89,7 @@ class EnsembleCritic(nn.Module):
     hidden_dim: int = 256
     num_critics: int = 10
     layernorm: bool = True
+    groupnorm: bool = False
     n_hiddens: int = 3
 
     @nn.compact
@@ -95,5 +102,5 @@ class EnsembleCritic(nn.Module):
             split_rngs={"params": True},
             axis_size=self.num_critics,
         )
-        q_values = ensemble(self.hidden_dim, self.layernorm, self.n_hiddens)(state, action)
+        q_values = ensemble(self.hidden_dim, self.layernorm, self.groupnorm, self.n_hiddens)(state, action)
         return q_values

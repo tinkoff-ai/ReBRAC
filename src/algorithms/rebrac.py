@@ -40,7 +40,9 @@ class Config:
     actor_bc_coef: float = 1.0
     critic_bc_coef: float = 1.0
     actor_ln: bool = False
+    actor_gn: bool = False
     critic_ln: bool = True
+    critic_gn: bool = False
     policy_noise: float = 0.2
     noise_clip: float = 0.5
     policy_freq: int = 2
@@ -236,7 +238,7 @@ def main(config: Config):
     init_action = buffer.data["actions"][0][None, ...]
 
     actor_module = DetActor(action_dim=init_action.shape[-1], hidden_dim=config.hidden_dim, layernorm=config.actor_ln,
-                            n_hiddens=config.actor_n_hiddens)
+                            groupnorm=config.actor_gn, n_hiddens=config.actor_n_hiddens)
     actor = ActorTrainState.create(
         apply_fn=actor_module.apply,
         params=actor_module.init(actor_key, init_state),
@@ -245,7 +247,7 @@ def main(config: Config):
     )
 
     critic_module = EnsembleCritic(hidden_dim=config.hidden_dim, num_critics=2, layernorm=config.critic_ln,
-                                   n_hiddens=config.critic_n_hiddens)
+                                   groupnorm=config.critic_gn, n_hiddens=config.critic_n_hiddens)
     critic = CriticTrainState.create(
         apply_fn=critic_module.apply,
         params=critic_module.init(critic_key, init_state, init_action),
