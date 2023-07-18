@@ -13,9 +13,37 @@ from typing import Dict, Tuple
 from src.utils.vd4rl_utils import ExtendedTimeStep, step_type_lookup
 
 
+def calc_return_to_go(is_sparse_reward, rewards, terminals, gamma):
+    """
+    A config dict for getting the default high/low rewrd values for each envs
+    This is used in calc_return_to_go func in sampler.py and replay_buffer.py
+    """
+    if len(rewards) == 0:
+        return np.array([])
+    reward_neg = 0
+    if is_sparse_reward and np.all(np.array(rewards) == reward_neg):
+        """
+        If the env has sparse reward and the trajectory is all negative rewards,
+        we use r / (1-gamma) as return to go.
+        For exapmle, if gamma = 0.99 and the rewards = [-1, -1, -1],
+        then return_to_go = [-100, -100, -100]
+        """
+        # assuming failure reward is negative
+        # use r / (1-gamma) for negative trajctory
+        return_to_go = [float(reward_neg / (1 - gamma))] * len(rewards)
+    else:
+        return_to_go = [0] * len(rewards)
+        prev_return = 0
+        for i in range(len(rewards)):
+            return_to_go[-i - 1] = rewards[-i - 1] + gamma * prev_return * (1 - terminals[-i - 1])
+            prev_return = return_to_go[-i - 1]
+
+    return np.array(return_to_go, dtype=np.float32)
+
+
 # source: https://github.com/rail-berkeley/d4rl/blob/d842aa194b416e564e54b0730d9f934e3e32f854/d4rl/__init__.py#L63
 # modified to also return next_action (needed for logging and in general useful to have)
-def qlearning_dataset(env, dataset=None, terminate_on_end=False, **kwargs):
+def qlearning_dataset(env, dataset_name, normalize_reward=False, dataset=None, terminate_on_end=False, discount=0.99, **kwargs):
     """
     Returns datasets formatted for use by standard Q-learning algorithms,
     with observations, actions, next_observations, next_actins, rewards,
@@ -39,21 +67,30 @@ def qlearning_dataset(env, dataset=None, terminate_on_end=False, **kwargs):
     """
     if dataset is None:
         dataset = env.get_dataset(**kwargs)
-
+    if normalize_reward:
+        dataset['rewards'] = ReplayBuffer.normalize_reward(dataset_name, dataset['rewards'])
     N = dataset['rewards'].shape[0]
+    is_sparse = "antmaze" in dataset_name
     obs_ = []
     next_obs_ = []
     action_ = []
     next_action_ = []
     reward_ = []
     done_ = []
+    mc_returns_ = []
 
     # The newer version of the dataset adds an explicit
     # timeouts field. Keep old method for backwards compatability.
     use_timeouts = 'timeouts' in dataset
 
     episode_step = 0
+    episode_rewards = []
+    episode_terminals = []
     for i in range(N - 1):
+        if episode_step == 0:
+            episode_rewards = []
+            episode_terminals = []
+
         obs = dataset['observations'][i].astype(np.float32)
         new_obs = dataset['observations'][i + 1].astype(np.float32)
         action = dataset['actions'][i].astype(np.float32)
@@ -68,9 +105,14 @@ def qlearning_dataset(env, dataset=None, terminate_on_end=False, **kwargs):
         if (not terminate_on_end) and final_timestep:
             # Skip this transition and don't apply terminals on the last step of an episode
             episode_step = 0
+            mc_returns_ += calc_return_to_go(is_sparse, episode_rewards, episode_terminals, discount)
             continue
         if done_bool or final_timestep:
             episode_step = 0
+            mc_returns_ += calc_return_to_go(is_sparse, episode_rewards, episode_terminals, discount)
+
+        episode_rewards.append(reward)
+        episode_terminals.append(done_bool)
 
         obs_.append(obs)
         next_obs_.append(new_obs)
@@ -87,6 +129,7 @@ def qlearning_dataset(env, dataset=None, terminate_on_end=False, **kwargs):
         'next_actions': np.array(next_action_),
         'rewards': np.array(reward_),
         'terminals': np.array(done_),
+        'mc_returns': np.array(mc_returns_),
     }
 
 
@@ -107,15 +150,16 @@ class ReplayBuffer:
     std: float = 1
 
     def create_from_d4rl(self, dataset_name: str, normalize_reward: bool = False,
-                         normalize: bool = False):
-        d4rl_data = qlearning_dataset(gym.make(dataset_name))
+                         normalize: bool = False, discount=0.99):
+        d4rl_data = qlearning_dataset(gym.make(dataset_name), dataset_name=dataset_name, normalize_reward=normalize_reward, discount=discount)
         buffer = {
             "states": jnp.asarray(d4rl_data["observations"], dtype=jnp.float32),
             "actions": jnp.asarray(d4rl_data["actions"], dtype=jnp.float32),
             "rewards": jnp.asarray(d4rl_data["rewards"], dtype=jnp.float32),
             "next_states": jnp.asarray(d4rl_data["next_observations"], dtype=jnp.float32),
             "next_actions": jnp.asarray(d4rl_data["next_actions"], dtype=jnp.float32),
-            "dones": jnp.asarray(d4rl_data["terminals"], dtype=jnp.float32)
+            "dones": jnp.asarray(d4rl_data["terminals"], dtype=jnp.float32),
+            "mc_returns": jnp.asarray(d4rl_data["mc_returns"], dtype=jnp.float32),
         }
         if normalize:
             self.mean, self.std = compute_mean_std(buffer["states"], eps=1e-3)
@@ -125,8 +169,8 @@ class ReplayBuffer:
             buffer["next_states"] = normalize_states(
                 buffer["next_states"], self.mean, self.std
             )
-        if normalize_reward:
-            buffer["rewards"] = ReplayBuffer.normalize_reward(dataset_name, buffer["rewards"])
+        # if normalize_reward:
+        #     buffer["rewards"] = ReplayBuffer.normalize_reward(dataset_name, buffer["rewards"])
         self.data = buffer
 
     @property

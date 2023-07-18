@@ -138,11 +138,12 @@ def update_critic(
         noise_clip,
     )
     next_actions = jax.numpy.clip(next_actions + noise, -1, 1)
+
     bc_penalty = ((next_actions - batch["next_actions"]) ** 2).sum(-1)
     next_q = critic.apply_fn(critic.target_params, batch["next_states"], next_actions).min(0)
+    lower_bounds = jax.numpy.repeat(batch['mc_returns'].reshape(-1, 1), next_q.shape[1], axis=1)
     next_q = next_q - beta * bc_penalty
-
-    target_q = batch["rewards"] + (1 - batch["dones"]) * gamma * next_q
+    target_q = jax.numpy.maximum(batch["rewards"] + (1 - batch["dones"]) * gamma * next_q, lower_bounds)
 
     def critic_loss_fn(critic_params):
         # [N, batch_size] - [1, batch_size]
@@ -225,7 +226,7 @@ def main(config: Config):
     )
     wandb.mark_preempting()
     buffer = ReplayBuffer()
-    buffer.create_from_d4rl(config.dataset_name, config.normalize_reward, config.normalize_states)
+    buffer.create_from_d4rl(config.dataset_name, config.normalize_reward, config.normalize_states, discount=config.gamma)
 
     key = jax.random.PRNGKey(seed=config.train_seed)
     key, actor_key, critic_key = jax.random.split(key, 3)
