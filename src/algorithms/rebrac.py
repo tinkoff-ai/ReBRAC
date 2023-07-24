@@ -141,9 +141,9 @@ def update_critic(
 
     bc_penalty = ((next_actions - batch["next_actions"]) ** 2).sum(-1)
     next_q = critic.apply_fn(critic.target_params, batch["next_states"], next_actions).min(0)
-    lower_bounds = jax.numpy.repeat(batch['mc_returns'].reshape(-1, 1), next_q.shape[1], axis=1)
+    # lower_bounds = jax.numpy.repeat(batch['mc_returns'].reshape(-1, 1), next_q.shape[1], axis=1)
     next_q = next_q - beta * bc_penalty
-    target_q = jax.numpy.maximum(batch["rewards"] + (1 - batch["dones"]) * gamma * next_q, lower_bounds)
+    target_q = jax.numpy.maximum(batch["rewards"] + (1 - batch["dones"]) * gamma * next_q, batch['mc_returns'])
 
     def critic_loss_fn(critic_params):
         # [N, batch_size] - [1, batch_size]

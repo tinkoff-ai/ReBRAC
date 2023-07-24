@@ -19,7 +19,7 @@ def calc_return_to_go(is_sparse_reward, rewards, terminals, gamma):
     This is used in calc_return_to_go func in sampler.py and replay_buffer.py
     """
     if len(rewards) == 0:
-        return np.array([])
+        return []
     reward_neg = 0
     if is_sparse_reward and np.all(np.array(rewards) == reward_neg):
         """
@@ -38,7 +38,7 @@ def calc_return_to_go(is_sparse_reward, rewards, terminals, gamma):
             return_to_go[-i - 1] = rewards[-i - 1] + gamma * prev_return * (1 - terminals[-i - 1])
             prev_return = return_to_go[-i - 1]
 
-    return np.array(return_to_go, dtype=np.float32)
+    return return_to_go
 
 
 # source: https://github.com/rail-berkeley/d4rl/blob/d842aa194b416e564e54b0730d9f934e3e32f854/d4rl/__init__.py#L63
@@ -78,7 +78,7 @@ def qlearning_dataset(env, dataset_name, normalize_reward=False, dataset=None, t
     reward_ = []
     done_ = []
     mc_returns_ = []
-
+    print("SIZE", N)
     # The newer version of the dataset adds an explicit
     # timeouts field. Keep old method for backwards compatability.
     use_timeouts = 'timeouts' in dataset
@@ -106,10 +106,12 @@ def qlearning_dataset(env, dataset_name, normalize_reward=False, dataset=None, t
             # Skip this transition and don't apply terminals on the last step of an episode
             episode_step = 0
             mc_returns_ += calc_return_to_go(is_sparse, episode_rewards, episode_terminals, discount)
+            # print(len(mc_returns_), len(episode_rewards), end=";")
             continue
         if done_bool or final_timestep:
             episode_step = 0
-            mc_returns_ += calc_return_to_go(is_sparse, episode_rewards, episode_terminals, discount)
+            # mc_returns_ += calc_return_to_go(is_sparse, episode_rewards, episode_terminals, discount)
+            # print(i, len(mc_returns_), len(episode_rewards))
 
         episode_rewards.append(reward)
         episode_terminals.append(done_bool)
@@ -121,7 +123,10 @@ def qlearning_dataset(env, dataset_name, normalize_reward=False, dataset=None, t
         reward_.append(reward)
         done_.append(done_bool)
         episode_step += 1
-
+    if episode_step != 0:
+        mc_returns_ += calc_return_to_go(is_sparse, episode_rewards, episode_terminals, discount)
+    print("SHAPE", np.array(mc_returns_).shape, np.array(reward_).shape, np.array(done_).shape)
+    assert np.array(mc_returns_).shape == np.array(reward_).shape
     return {
         'observations': np.array(obs_),
         'actions': np.array(action_),
