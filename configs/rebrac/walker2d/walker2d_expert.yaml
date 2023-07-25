@@ -4,7 +4,7 @@ actor_ln: false
 actor_n_hiddens: 3
 batch_size: 1024
 critic_bc_coef: 0.5
-critic_learning_rate: 0.001
+critic_learning_rate: 0.5
 critic_ln: true
 critic_n_hiddens: 3
 dataset_name: walker2d-expert-v2

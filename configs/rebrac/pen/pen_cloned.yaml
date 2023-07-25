@@ -1,4 +1,4 @@
-actor_bc_coef: 0.05
+actor_bc_coef: 0.1
 actor_learning_rate: 0.0003
 actor_ln: false
 actor_n_hiddens: 3

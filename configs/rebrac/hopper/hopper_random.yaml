@@ -1,9 +1,9 @@
-actor_bc_coef: 0.001
+actor_bc_coef: 0.01
 actor_learning_rate: 0.001
 actor_ln: false
 actor_n_hiddens: 3
 batch_size: 1024
-critic_bc_coef: 0.01
+critic_bc_coef: 0.5
 critic_learning_rate: 0.001
 critic_ln: true
 critic_n_hiddens: 3
