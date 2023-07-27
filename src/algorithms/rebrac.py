@@ -330,7 +330,7 @@ def main(config: Config):
         wandb.log({"epoch": epoch, **{f"ReBRAC/{k}": v for k, v in mean_metrics.items()}})
 
         if epoch % config.eval_every == 0 or epoch == config.num_epochs - 1:
-            eval_returns = evaluate(eval_env, update_carry["actor"].params, actor_action_fn, config.eval_episodes,
+            eval_returns, success_rate = evaluate(eval_env, update_carry["actor"].params, actor_action_fn, config.eval_episodes,
                                     seed=config.eval_seed)
             normalized_score = eval_env.get_normalized_score(eval_returns) * 100.0
             wandb.log({

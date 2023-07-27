@@ -22,7 +22,10 @@ from flax.training.train_state import TrainState
 
 from src.networks import EnsembleCritic, DetActor
 from src.utils.buffer import ReplayBuffer, OnlineReplayBuffer, make_env_and_dataset, concat_batches
-from src.utils.common import Metrics, make_env, evaluate, wrap_env
+from src.utils.common import Metrics, make_env, evaluate, wrap_env, is_goal_reached
+
+
+ENVS_WITH_GOAL = ("antmaze", "pen", "door", "hammer", "relocate")
 
 
 @dataclass
@@ -230,7 +233,7 @@ def main(config: Config):
     # config.actor_bc_coef = config.critic_bc_coef * config.bc_coef_mul
     dict_config = asdict(config)
     dict_config["mlc_job_name"] = os.environ.get("PLATFORM_JOB_NAME")
-
+    is_env_with_goal = config.dataset_name.startswith(ENVS_WITH_GOAL)
     np.random.seed(config.train_seed)
     random.seed(config.train_seed)
 
@@ -346,11 +349,14 @@ def main(config: Config):
 
     observation, done = env.reset(), False
     episode_step = 0
+    goal_achieved = False
 
     @jax.jit
     def actor_action_fn(params, obs):
         return actor.apply_fn(params, obs)
 
+    eval_successes = []
+    train_successes = []
     print("Offline training")
     for i in tqdm.tqdm(range(config.num_online_updates + config.num_offline_updates), smoothing=0.1):
         carry["metrics"] = Metrics.create(bc_metrics_to_log)
@@ -384,6 +390,7 @@ def main(config: Config):
                 policy_noise=config.policy_noise,
                 noise_clip=config.noise_clip,
             )
+        online_log = {}
 
         if i >= config.num_offline_updates:
             episode_step += 1
@@ -401,6 +408,8 @@ def main(config: Config):
 
             # print(action.shape)
             next_observation, reward, done, info = env.step(action)
+            if not goal_achieved:
+                goal_achieved = is_goal_reached(reward, info)
             next_action = np.asarray(actor_action_fn(carry["actor"].params, next_observation))[0]
             next_action = np.array(
                 [
@@ -423,10 +432,11 @@ def main(config: Config):
             online_buffer.insert(observation, action, reward, mask,
                                  float(real_done), next_observation, next_action, 0)
             observation = next_observation
-
             if done:
+                train_successes.append(goal_achieved)
                 observation, done = env.reset(), False
                 episode_step = 0
+                goal_achieved = False
 
             #     for k, v in info['episode'].items():
             #         summary_writer.add_scalar(f'training/{k}', v,
@@ -483,15 +493,21 @@ def main(config: Config):
         if i % config.eval_every == 0 or i == config.num_offline_updates + config.num_online_updates - 1 or i == config.num_offline_updates - 1:
             # actor_action_fn = action_fn(actor=update_carry["actor"])
 
-            eval_returns = evaluate(eval_env, carry["actor"].params, actor_action_fn, config.eval_episodes,
+            eval_returns, success_rate = evaluate(eval_env, carry["actor"].params, actor_action_fn, config.eval_episodes,
                                     seed=config.eval_seed)
             normalized_score = eval_env.get_normalized_score(eval_returns) * 100.0
-            wandb.log({
+            eval_successes.append(success_rate)
+            if is_env_with_goal:
+                online_log["train/regret"] = np.mean(1 - np.array(train_successes))
+            offline_log = {
                 "eval/return_mean": np.mean(eval_returns),
                 "eval/return_std": np.std(eval_returns),
                 "eval/normalized_score_mean": np.mean(normalized_score),
-                "eval/normalized_score_std": np.std(normalized_score)
-            })
+                "eval/normalized_score_std": np.std(normalized_score),
+                "eval/success_rate": success_rate
+            }
+            offline_log.update(online_log)
+            wandb.log(offline_log)
 
 
 if __name__ == "__main__":

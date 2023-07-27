@@ -65,20 +65,32 @@ def wrap_env(
     return env
 
 
-def evaluate(env: gym.Env, params, action_fn: Callable, num_episodes: int, seed: int) -> np.ndarray:
+def is_goal_reached(reward: float, info: Dict) -> bool:
+    if "goal_achieved" in info:
+        return info["goal_achieved"]
+    return reward > 0  # Assuming that reaching target is a positive reward
+
+
+
+def evaluate(env: gym.Env, params, action_fn: Callable, num_episodes: int, seed: int) -> Tuple[np.ndarray, np.ndarray]:
     env.seed(seed)
     env.action_space.seed(seed)
     env.observation_space.seed(seed)
 
     returns = []
+    successes = []
     for _ in trange(num_episodes, desc="Eval", leave=False):
     # for _ in range(num_episodes):
         obs, done = env.reset(), False
+        goal_achieved = False
         total_reward = 0.0
         while not done:
             action = np.asarray(jax.device_get(action_fn(params, obs)))
-            obs, reward, done, _ = env.step(action)
+            obs, reward, done, info = env.step(action)
             total_reward += reward
+            if not goal_achieved:
+                goal_achieved = is_goal_reached(reward, info)
+        successes.append(float(goal_achieved))
         returns.append(total_reward)
 
-    return np.array(returns)
+    return np.array(returns), np.mean(successes)
