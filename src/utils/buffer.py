@@ -383,3 +383,175 @@ def add_offline_data_to_buffer(offline_data: dict, replay_buffer: EfficientRepla
                 stacked_frames.append(time_step.observation)
             time_step_stack = time_step._replace(observation=np.concatenate(stacked_frames, axis=0))
             replay_buffer.add(time_step_stack)
+
+
+class Dataset(object):
+    def __init__(self, observations: np.ndarray, actions: np.ndarray,
+                 rewards: np.ndarray, masks: np.ndarray,
+                 dones_float: np.ndarray, next_observations: np.ndarray,
+                 next_actions: np.ndarray,
+                 mc_returns: np.ndarray,
+                 size: int):
+        self.observations = observations
+        self.actions = actions
+        self.rewards = rewards
+        self.masks = masks
+        self.dones_float = dones_float
+        self.next_observations = next_observations
+        self.next_actions = next_actions
+        self.mc_returns = mc_returns
+        self.size = size
+
+    def sample(self, batch_size: int) -> Dict[str, np.ndarray]:
+        indx = np.random.randint(self.size, size=batch_size)
+        return {
+            "states": self.observations[indx],
+            "actions": self.actions[indx],
+            "rewards": self.rewards[indx],
+            "dones": self.dones_float[indx],
+            "next_states": self.next_observations[indx],
+            "next_actions": self.next_actions[indx],
+            "mc_returns": self.mc_returns[indx],
+        }
+
+
+class OnlineReplayBuffer(Dataset):
+    def __init__(self, observation_space: gym.spaces.Box, action_dim: int,
+                 capacity: int):
+
+        observations = np.empty((capacity, *observation_space.shape),
+                                dtype=observation_space.dtype)
+        actions = np.empty((capacity, action_dim), dtype=np.float32)
+        rewards = np.empty((capacity,), dtype=np.float32)
+        mc_returns = np.empty((capacity,), dtype=np.float32)
+        masks = np.empty((capacity,), dtype=np.float32)
+        dones_float = np.empty((capacity,), dtype=np.float32)
+        next_observations = np.empty((capacity, *observation_space.shape),
+                                     dtype=observation_space.dtype)
+        next_actions = np.empty((capacity, action_dim), dtype=np.float32)
+        super().__init__(observations=observations,
+                         actions=actions,
+                         rewards=rewards,
+                         masks=masks,
+                         dones_float=dones_float,
+                         next_observations=next_observations,
+                         next_actions=next_actions,
+                         mc_returns=mc_returns,
+                         size=0)
+
+        self.size = 0
+
+        self.insert_index = 0
+        self.capacity = capacity
+
+    def initialize_with_dataset(self, dataset: Dataset,
+                                num_samples=None):
+        assert self.insert_index == 0, 'Can insert a batch online in an empty replay buffer.'
+
+        dataset_size = len(dataset.observations)
+
+        if num_samples is None:
+            num_samples = dataset_size
+        else:
+            num_samples = min(dataset_size, num_samples)
+        assert self.capacity >= num_samples, 'Dataset cannot be larger than the replay buffer capacity.'
+
+        if num_samples < dataset_size:
+            perm = np.random.permutation(dataset_size)
+            indices = perm[:num_samples]
+        else:
+            indices = np.arange(num_samples)
+
+        self.observations[:num_samples] = dataset.observations[indices]
+        self.actions[:num_samples] = dataset.actions[indices]
+        self.rewards[:num_samples] = dataset.rewards[indices]
+        self.masks[:num_samples] = dataset.masks[indices]
+        self.dones_float[:num_samples] = dataset.dones_float[indices]
+        self.next_observations[:num_samples] = dataset.next_observations[
+            indices]
+        self.next_actions[:num_samples] = dataset.next_actions[
+            indices]
+        self.mc_returns[:num_samples] = dataset.mc_returns[indices]
+
+        self.insert_index = num_samples
+        self.size = num_samples
+
+    def insert(self, observation: np.ndarray, action: np.ndarray,
+               reward: float, mask: float, done_float: float,
+               next_observation: np.ndarray,
+               next_action: np.ndarray, mc_return: np.ndarray):
+        self.observations[self.insert_index] = observation
+        self.actions[self.insert_index] = action
+        self.rewards[self.insert_index] = reward
+        self.masks[self.insert_index] = mask
+        self.dones_float[self.insert_index] = done_float
+        self.next_observations[self.insert_index] = next_observation
+        self.next_actions[self.insert_index] = next_action
+        self.mc_returns[self.insert_index] = mc_return
+
+        self.insert_index = (self.insert_index + 1) % self.capacity
+        self.size = min(self.size + 1, self.capacity)
+
+
+
+class D4RLDataset(Dataset):
+    def __init__(self,
+                 env: gym.Env,
+                 env_name: str,
+                 normalize_reward: bool,
+                 discount: float,
+                 clip_to_eps: bool = False,
+                 eps: float = 1e-5):
+
+        d4rl_data = qlearning_dataset(env, env_name, normalize_reward=normalize_reward, discount=discount)
+        dataset = {
+            "states": jnp.asarray(d4rl_data["observations"], dtype=jnp.float32),
+            "actions": jnp.asarray(d4rl_data["actions"], dtype=jnp.float32),
+            "rewards": jnp.asarray(d4rl_data["rewards"], dtype=jnp.float32),
+            "next_states": jnp.asarray(d4rl_data["next_observations"], dtype=jnp.float32),
+            "next_actions": jnp.asarray(d4rl_data["next_actions"], dtype=jnp.float32),
+            "dones": jnp.asarray(d4rl_data["terminals"], dtype=jnp.float32),
+            "mc_returns": jnp.asarray(d4rl_data["mc_returns"], dtype=jnp.float32)
+        }
+
+        super().__init__(dataset['states'].astype(np.float32),
+                         actions=dataset['actions'].astype(np.float32),
+                         rewards=dataset['rewards'].astype(np.float32),
+                         masks=1.0 - dataset['dones'].astype(np.float32),
+                         dones_float=dataset['dones'].astype(np.float32),
+                         next_observations=dataset['next_states'].astype(
+                             np.float32),
+                         next_actions=dataset["next_actions"],
+                         mc_returns=dataset["mc_returns"],
+                         size=len(dataset['states']))
+
+
+def make_env_and_dataset(env_name: str,
+                         seed: int,
+                         normalize_reward: bool,
+                         discount: float) -> Tuple[gym.Env, D4RLDataset]:
+    env = gym.make(env_name)
+
+    env.seed(seed)
+    env.action_space.seed(seed)
+    env.observation_space.seed(seed)
+
+    dataset = D4RLDataset(env, env_name, normalize_reward, discount=discount)
+
+    # if 'antmaze' in env_name:
+    #     # dataset.rewards -= 1.0
+    #     pass  # normalized in the batch instead
+    #     # See https://github.com/aviralkumar2907/CQL/blob/master/d4rl/examples/cql_antmaze_new.py#L22
+    #     # but I found no difference between (x - 0.5) * 4 and x - 1.0
+    # elif ('halfcheetah' in env_name or 'walker2d' in env_name
+    #       or 'hopper' in env_name):
+    #     normalize(dataset)
+
+    return env, dataset
+
+
+def concat_batches(b1, b2):
+    new_batch = {}
+    for k in b1:
+        new_batch[k] = np.concatenate((b1[k], b2[k]), axis=0)
+    return new_batch
