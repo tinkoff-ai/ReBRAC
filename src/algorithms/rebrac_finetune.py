@@ -493,7 +493,7 @@ def main(config: Config):
             key=key, actor=new_actor, critic=new_critic, metrics=new_metrics
         )
 
-        if i % 1 == 0:
+        if i % 1000 == 0:
             mean_metrics = carry["metrics"].compute()
             common = {f"TD3/{k}": v for k, v in mean_metrics.items()}
             common["actor_bc_coef"] = actor_bc_coef
