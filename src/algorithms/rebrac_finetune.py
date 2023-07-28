@@ -55,6 +55,8 @@ class Config:
     policy_freq: int = 2
     normalize_q: bool = True
     min_decay_coef: float = 0.0
+    use_calibration: bool = False
+    use_tanh: bool = False
     # training params
     dataset_name: str = "halfcheetah-medium-v2"
     batch_size: int = 256
@@ -140,6 +142,7 @@ def update_critic(
         tau: float,
         policy_noise: float,
         noise_clip: float,
+        use_calibration: bool,
         metrics: Metrics,
 ) -> Tuple[jax.random.PRNGKey, TrainState, Metrics]:
     key, actions_key = jax.random.split(key)
@@ -156,8 +159,11 @@ def update_critic(
     next_q = critic.apply_fn(critic.target_params, batch["next_states"], next_actions).min(0)
     # lower_bounds = jax.numpy.repeat(batch['mc_returns'].reshape(-1, 1), next_q.shape[1], axis=1)
     next_q = next_q - beta * bc_penalty
-    # target_q = jax.numpy.maximum(batch["rewards"] + (1 - batch["dones"]) * gamma * next_q, batch['mc_returns'])
-    target_q = batch["rewards"] + (1 - batch["dones"]) * gamma * next_q
+    target_q = jax.lax.cond(
+        use_calibration,
+        lambda: jax.numpy.maximum(batch["rewards"] + (1 - batch["dones"]) * gamma * next_q, batch['mc_returns']),
+        lambda: batch["rewards"] + (1 - batch["dones"]) * gamma * next_q
+    )
 
     def critic_loss_fn(critic_params):
         # [N, batch_size] - [1, batch_size]
@@ -189,9 +195,10 @@ def update_td3(
         policy_noise: float,
         noise_clip: float,
         normalize_q: bool,
+        use_calibration: bool,
 ):
     key, new_critic, new_metrics = update_critic(
-        key, actor, critic, batch, gamma, critic_bc_coef, tau, policy_noise, noise_clip, metrics
+        key, actor, critic, batch, gamma, critic_bc_coef, tau, policy_noise, noise_clip, use_calibration, metrics
     )
     key, new_actor, new_critic, new_metrics = update_actor(key, actor,
                                                            new_critic, batch, actor_bc_coef, tau, normalize_q,
@@ -212,9 +219,10 @@ def update_td3_no_targets(
         tau: float,
         policy_noise: float,
         noise_clip: float,
+        use_calibration: bool,
 ):
     key, new_critic, new_metrics = update_critic(
-        key, actor, critic, batch, gamma, critic_bc_coef, tau, policy_noise, noise_clip, metrics
+        key, actor, critic, batch, gamma, critic_bc_coef, tau, policy_noise, noise_clip, use_calibration, metrics
     )
     return key, actor, new_critic, new_metrics
 
@@ -261,7 +269,7 @@ def main(config: Config):
         tx=optax.adam(learning_rate=config.actor_learning_rate),
     )
 
-    critic_module = EnsembleCritic(hidden_dim=config.hidden_dim, num_critics=2, layernorm=config.critic_ln, use_tanh=True)
+    critic_module = EnsembleCritic(hidden_dim=config.hidden_dim, num_critics=2, layernorm=config.critic_ln, use_tanh=config.use_tanh)
     critic = CriticTrainState.create(
         apply_fn=critic_module.apply,
         params=critic_module.init(critic_key, init_state, init_action),
@@ -275,6 +283,7 @@ def main(config: Config):
         policy_noise=config.policy_noise,
         noise_clip=config.noise_clip,
         normalize_q=config.normalize_q,
+        use_calibration=config.use_calibration,
     )
 
     update_td3_no_targets_partial = partial(
@@ -282,6 +291,7 @@ def main(config: Config):
         actor_bc_coef=config.actor_bc_coef, critic_bc_coef=config.critic_bc_coef, tau=config.tau,
         policy_noise=config.policy_noise,
         noise_clip=config.noise_clip,
+        use_calibration=config.use_calibration,
     )
 
     def td3_loop_update_step(i, carry):
@@ -382,6 +392,7 @@ def main(config: Config):
                 policy_noise=config.policy_noise,
                 noise_clip=config.noise_clip,
                 normalize_q=config.normalize_q,
+                use_calibration=config.use_calibration,
             )
 
         update_td3_no_targets_partial = partial(
@@ -389,6 +400,7 @@ def main(config: Config):
                 tau=config.tau,
                 policy_noise=config.policy_noise,
                 noise_clip=config.noise_clip,
+                use_calibration=config.use_calibration,
             )
         online_log = {}
 
@@ -481,7 +493,7 @@ def main(config: Config):
             key=key, actor=new_actor, critic=new_critic, metrics=new_metrics
         )
 
-        if i % 1000 == 0:
+        if i % 1 == 0:
             mean_metrics = carry["metrics"].compute()
             common = {f"TD3/{k}": v for k, v in mean_metrics.items()}
             common["actor_bc_coef"] = actor_bc_coef
