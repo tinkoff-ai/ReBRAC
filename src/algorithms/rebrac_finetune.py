@@ -62,6 +62,7 @@ class Config:
     num_updates_on_epoch: int = 1000
     num_offline_updates: int = 1_000_000
     num_online_updates: int = 1_000_000
+    num_warmup_steps: int = 0
     normalize_reward: bool = False
     normalize_states: bool = False
     # evaluation params
@@ -441,6 +442,9 @@ def main(config: Config):
             #     for k, v in info['episode'].items():
             #         summary_writer.add_scalar(f'training/{k}', v,
             #                                   info['total']['timesteps'])
+        if config.num_offline_updates <= i < config.num_offline_updates + config.num_warmup_steps:
+            continue
+
         offline_batch = replay_buffer.sample(offline_batch_size)
         online_batch = online_buffer.sample(online_batch_size)
         batch = concat_batches(offline_batch, online_batch)
@@ -454,7 +458,7 @@ def main(config: Config):
         actor_bc_coef = config.actor_bc_coef
         critic_bc_coef = config.critic_bc_coef
         if i >= config.num_offline_updates:
-            decay_coef = max(config.min_decay_coef, (config.num_online_updates + config.num_offline_updates - i) / config.num_online_updates)
+            decay_coef = max(config.min_decay_coef, (config.num_online_updates + config.num_offline_updates - i + config.num_warmup_steps) / config.num_online_updates)
             # decay_coef = (1 - (1 - decay_coef) ** 4)  # np.exp(np.log(0.5) * (1 -decay_coef))
             actor_bc_coef *= decay_coef
             critic_bc_coef *= 0 #decay_coef
