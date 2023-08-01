@@ -57,6 +57,7 @@ class Config:
     min_decay_coef: float = 0.0
     use_calibration: bool = False
     use_tanh: bool = False
+    reset_opts: bool = False
     # training params
     dataset_name: str = "halfcheetah-medium-v2"
     batch_size: int = 256
@@ -380,12 +381,13 @@ def main(config: Config):
             # replay_buffer = OnlineReplayBuffer(env.observation_space, action_dim,
             #                                    config.replay_buffer_size)
             # Reset optimizers similar to SPOT
-            # actor = actor.replace(
-            #     opt_state=optax.adam(learning_rate=config.actor_learning_rate).init(actor.params)
-            # )
-            # critic = critic.replace(
-            #     opt_state=optax.adam(learning_rate=config.critic_learning_rate).init(critic.params)
-            # )
+            if config.reset_opts:
+                actor = actor.replace(
+                    opt_state=optax.adam(learning_rate=config.actor_learning_rate).init(actor.params)
+                )
+                critic = critic.replace(
+                    opt_state=optax.adam(learning_rate=config.critic_learning_rate).init(critic.params)
+                )
 
         update_td3_partial = partial(
                 update_td3, gamma=config.gamma,
