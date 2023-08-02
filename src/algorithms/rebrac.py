@@ -39,6 +39,7 @@ class Config:
     tau: float = 5e-3
     actor_bc_coef: float = 1.0
     critic_bc_coef: float = 1.0
+    bc_coef: float = None
     actor_ln: bool = False
     critic_ln: bool = True
     policy_noise: float = 0.2
@@ -213,6 +214,9 @@ def action_fn(actor: TrainState) -> Callable:
 
 @pyrallis.wrap()
 def main(config: Config):
+    if config.bc_coef is not None:
+        config.actor_bc_coef = config.bc_coef
+        config.critic_bc_coef = config.bc_coef
     dict_config = asdict(config)
     dict_config["mlc_job_name"] = os.environ.get("PLATFORM_JOB_NAME")
 
